@@ -145,8 +145,8 @@ export default function FeaturedBlocks({ selectedCategory, onSelectCategory }: F
 
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-off-white">
               {/* List Section (Reduced width and adjusted padding) */}
-              <div className="w-full md:w-[38.5%] overflow-y-auto px-6 md:px-10 py-8 flex flex-col bg-off-white border-r border-black/5">
-                <div className="flex flex-col gap-3">
+              <div className="w-full md:w-[38.5%] overflow-hidden md:overflow-y-auto px-0 md:px-10 py-0 md:py-8 flex flex-col bg-off-white border-r border-black/5">
+                <div className="max-h-[34svh] md:max-h-none overflow-y-auto px-6 py-5 md:px-0 md:py-0 flex flex-col gap-3">
                   {filteredProjects.map((project) => (
                     <motion.button
                       key={project.id}
@@ -163,6 +163,45 @@ export default function FeaturedBlocks({ selectedCategory, onSelectCategory }: F
                       </div>
                     </motion.button>
                   ))}
+                </div>
+
+                <div className="md:hidden flex-1 min-h-0 border-t border-black/5">
+                  <div className="h-full overflow-hidden px-0 py-5">
+                    <motion.div
+                      className="flex h-full w-max gap-4 px-6"
+                      animate={{ x: ['0%', '-50%'] }}
+                      transition={{
+                        duration: Math.max(18, filteredProjects.length * 7),
+                        ease: 'linear',
+                        repeat: Infinity
+                      }}
+                    >
+                      {[...filteredProjects, ...filteredProjects].map((project, index) => (
+                        <motion.button
+                          key={`${project.id}-mobile-thumb-${index}`}
+                          onClick={() => setActiveProject(project)}
+                          className="group w-[72vw] h-full max-h-[44svh] shrink-0 text-left text-electric-blue"
+                        >
+                          <div className="h-full flex flex-col">
+                            <div className="flex-1 min-h-0 overflow-hidden bg-electric-blue/5">
+                              <img
+                                src={project.imageUrl}
+                                alt={project.title}
+                                className="w-full h-full object-contain transition-transform duration-500 group-active:scale-105"
+                                referrerPolicy="no-referrer"
+                              />
+                            </div>
+                            <div className="pt-3">
+                              <span className="text-[9px] font-mono opacity-40 uppercase">{project.year}</span>
+                              <h4 className="text-lg font-bold tracking-tighter uppercase leading-none">
+                                {project.title}
+                              </h4>
+                            </div>
+                          </div>
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  </div>
                 </div>
               </div>
 

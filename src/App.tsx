@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef, useMemo, type MouseEvent } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useRef, useMemo, type MouseEvent } from 'react';
+import { motion } from 'motion/react';
 import Navigation from './components/Navigation';
 import FeaturedBlocks from './components/FeaturedBlocks';
 import { DVDBounce } from './components/DVDBounce';
-import MusicPlayer from './components/MusicPlayer';
 
 function PixelateFilter({ id, size }: { id: string; size: number }) {
   return (
@@ -25,7 +24,9 @@ export default function App() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const bounceAreaRef = useRef<HTMLDivElement>(null);
+  const mobileBounceAreaRef = useRef<HTMLDivElement>(null);
+  const desktopUpperBounceAreaRef = useRef<HTMLDivElement>(null);
+  const desktopLowerBounceAreaRef = useRef<HTMLDivElement>(null);
 
   const openCategory = (category: string) => {
     setSelectedCategory(category);
@@ -47,6 +48,8 @@ export default function App() {
       openCategory('Techpack');
     }},
   ], []);
+  const desktopUpperBounceItems = useMemo(() => bounceItems.slice(0, 2), [bounceItems]);
+  const desktopLowerBounceItems = useMemo(() => bounceItems.slice(2), [bounceItems]);
 
   const handleMouseMove = (e: MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -69,28 +72,47 @@ export default function App() {
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {/* DVD Bounce Menu - Restricted to Bottom Right Area */}
-        <div className="absolute bottom-[2%] md:bottom-[15%] right-0 md:right-6 w-full md:w-[70vw] h-60 md:h-96 z-20 pointer-events-none px-4 md:px-0" ref={bounceAreaRef}>
-          <DVDBounce 
-            containerRef={bounceAreaRef}
-            items={bounceItems}
-          />
-        </div>
-        
         <div className="relative z-10 max-w-screen-2xl mx-auto w-full">
-          <motion.a 
-            href="#design"
-            className="relative block"
-          >
+          <div className="relative block">
             {/* Layer 1: The Sharp Base */}
             <motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[18vw] md:text-[20vw] leading-[0.75] font-sans font-extrabold text-electric-blue tracking-tighter uppercase cursor-pointer hover:opacity-80 transition-opacity"
+              className="text-[18vw] md:text-[16vw] leading-[0.75] font-sans font-extrabold text-electric-blue tracking-tighter uppercase cursor-pointer hover:opacity-80 transition-opacity"
             >
               issues <br /> hd
             </motion.h1>
+
+            <div
+              className="absolute left-2 right-2 top-[8.75rem] h-[44svh] z-30 pointer-events-none md:hidden"
+              ref={mobileBounceAreaRef}
+            >
+              <DVDBounce
+                containerRef={mobileBounceAreaRef}
+                items={bounceItems}
+              />
+            </div>
+
+            <div
+              className="absolute z-30 pointer-events-none hidden md:block md:left-[50vw] md:right-0 md:top-[2vw] md:h-[14vw]"
+              ref={desktopUpperBounceAreaRef}
+            >
+              <DVDBounce
+                containerRef={desktopUpperBounceAreaRef}
+                items={desktopUpperBounceItems}
+              />
+            </div>
+
+            <div
+              className="absolute z-30 pointer-events-none hidden md:block md:left-[28vw] md:right-0 md:top-[11vw] md:h-[13vw]"
+              ref={desktopLowerBounceAreaRef}
+            >
+              <DVDBounce
+                containerRef={desktopLowerBounceAreaRef}
+                items={desktopLowerBounceItems}
+              />
+            </div>
 
             {/* Layer 2: The Pixelated Overlay (Clipped to mouse) - Hidden on Mobile */}
             <motion.h1 
@@ -98,7 +120,7 @@ export default function App() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: isHovering ? 1 : 0, y: 0 }}
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute top-0 left-0 text-[18vw] md:text-[20vw] leading-[0.75] font-sans font-extrabold text-electric-blue tracking-tighter uppercase cursor-pointer pointer-events-none select-none hidden md:block"
+              className="absolute top-0 left-0 text-[18vw] md:text-[16vw] leading-[0.75] font-sans font-extrabold text-electric-blue tracking-tighter uppercase cursor-pointer pointer-events-none select-none hidden md:block"
               style={{ 
                 filter: 'url(#hero-pixelate)',
                 clipPath: `circle(120px at ${mousePos.x}px ${mousePos.y}px)`,
@@ -107,13 +129,13 @@ export default function App() {
             >
               issues <br /> hd
             </motion.h1>
-          </motion.a>
+          </div>
           
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
-            className="mt-8 md:mt-24 flex flex-col md:flex-row justify-between items-start md:items-end gap-12 md:gap-8"
+            className="mt-[44svh] md:mt-24 flex flex-col md:flex-row justify-between items-start md:items-end gap-8 md:gap-8"
           >
             <div className="flex flex-col gap-6 md:gap-8 items-start w-full md:w-auto">
               <p className="max-w-md text-electric-blue/40 font-sans text-lg md:text-xl tracking-tight leading-relaxed">
@@ -121,7 +143,6 @@ export default function App() {
                 Synthesizing technical precision with <br />
                 editorial experimentation.
               </p>
-              <MusicPlayer />
             </div>
             
             <div className="flex flex-col items-start md:items-end w-full md:w-auto">
@@ -142,8 +163,8 @@ export default function App() {
       <footer id="contact" className="h-screen snap-start bg-off-white flex flex-col justify-center px-4 md:px-12 text-electric-blue">
         <div className="max-w-screen-2xl mx-auto w-full">
           <span className="text-[10px] md:text-[12px] font-bold tracking-[0.3em] md:tracking-[0.5em] text-neutral-400 uppercase block mb-6 md:mb-8">Ready to collaborate?</span>
-          <a href="mailto:andrecorreia999@gmail.com" className="text-[12vw] md:text-[10vw] font-bold tracking-tighter hover:opacity-50 transition-colors underline decoration-1 underline-offset-[10px] md:underline-offset-[20px] break-all md:break-normal">
-            ANDRECORREIA999<br className="md:hidden" />@GMAIL.COM
+          <a href="mailto:andrecorreia999@gmail.com" className="block w-full text-[5.8vw] md:text-[5.7vw] font-bold tracking-tighter hover:opacity-50 transition-colors underline decoration-1 underline-offset-[8px] md:underline-offset-[18px] whitespace-nowrap">
+            ANDRECORREIA999@GMAIL.COM
           </a>
           
           <div className="mt-16 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">

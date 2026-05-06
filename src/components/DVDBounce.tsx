@@ -42,9 +42,9 @@ export function DVDBounce({ containerRef, items }: { containerRef: RefObject<HTM
         const w = el?.offsetWidth || (isMobile ? 80 : 120);
         const h = el?.offsetHeight || (isMobile ? 30 : 40);
 
-        // Adjusted speed
-        x += vx * 0.81;
-        y += vy * 0.81;
+        const speedMultiplier = 0.405;
+        x += vx * speedMultiplier;
+        y += vy * speedMultiplier;
 
         // Bounce logic with slight padding
         if (x <= 0) {
